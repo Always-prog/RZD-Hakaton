@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	<title>Характеристики груза</title>
+	<style>
+		.header{
+			text-align: center;
+		}
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		th,
+		td {
+			padding: 7px;
+			text-align: left;
+			border-bottom: 1px solid #ddd;
+		}
+	</style>
+</head>
+
+<body>
+	<h2 class="header">Характеристики груза</h2>
+
+	<table id="cargo_table" class="responsive-table striped">
+		<thead>
+			<tr>
+				<th>№ п/п</th>
+				<th>№ груза</th>
+				<th>Наименование груза</th>
+				<th>Длина (мм)</th>
+				<th>Ширина (мм)</th>
+				<th>Высота (мм)</th>
+				<th>Кол-во (шт)</th>
+				<th>Вес 1 ед (кг)</th>
+				<th>Общий вес (кг)</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+
+	<button class="btn waves-effect waves-light" onclick="addRow()">Добавить строку</button>
+	<button class="btn waves-effect waves-light" onclick="sendData()">Отправить данные</button>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<script>
+		/* Inserts a new row into the table with the class "cargo_table".
+		The row contains cells with various data, including a number, cargo number, and input fields.
+		The total weight of the cargo is calculated based on the quantity and weight input values.
+		The function listens for input events on the quantity and weight input fields and updates the total weight cell accordingly.
+		*/
+		function addRow() {
+			const table = document.querySelector("#cargo_table");
+			const row = table.insertRow(table.rows.length);
+			const cellNumber = table.rows[0].cells.length;
+			let cells = [];
+			const number_pp_cell = row.insertCell(0);
+			number_pp_cell.innerHTML = "<th class='number_pp'>" + (table.rows.length - 1) + "</th>";
+			cells.push(number_pp_cell);
+			const cargo_number_cell = row.insertCell(1);
+			cargo_number_cell.innerHTML = "<th class='cargo_number'>" + (table.rows.length - 1) + "</th>";
+			cells.push(cargo_number_cell);
+			for (let index = 2; index < cellNumber - 1; index++) {
+				const cell = row.insertCell(index);
+				cell.innerHTML = "<input type='text'>";
+				cells.push(cell);
+			}
+
+			const total_weight_cell = row.insertCell(8);
+			total_weight_cell.innerHTML = "<th class='total_weight'>0</th>";
+			cells.push(total_weight_cell);
+			const updateTotalWeight = function () {
+				const quantity = parseFloat(cells[6].querySelector("input").value);
+				const weight = parseFloat(cells[7].querySelector("input").value);
+				if (!isNaN(quantity) && !isNaN(weight)) {
+					cells[8].innerHTML = `<th>${quantity * weight}</th>`;
+				} else {
+					cells[8].innerHTML = `<th>0</th>`;
+				}
+			};
+
+			cells[6].addEventListener("input", updateTotalWeight);
+			cells[7].addEventListener("input", updateTotalWeight);
+		}
+
+		// Sends the data from a HTML table to a specified URL via a POST request.
+		function sendData() {
+			const table = document.querySelector("#cargo_table");
+			const rows = table.rows;
+			const data = [];
+
+			for (let i = 0; i < rows.length; i++) {
+				const row = rows[i];
+				const cells = row.cells;
+				const rowData = [];
+
+				for (let j = 0; j < cells.length; j++) {
+					const cell = cells[j];
+					const value = cell.querySelector("input") ? cell.querySelector("input").value : cell.innerHTML;
+					rowData.push(value);
+				}
+
+				data.push(rowData);
+			}
+			fetch("/result", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(data)
+			})
+				.then(response => {
+					var newPageUrl = response.url;
+					window.location.href = newPageUrl;
+				})
+				.catch(error => {
+					// Handle error
+					console.error(error);
+				});
+
+			/*
+			const xhr = new XMLHttpRequest();
+			xhr.open("POST", "https://3ec79579-3055-4665-bf4c-6ba87105f58d.mock.pstmn.io", true);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState === 4 && xhr.status === 200) {
+					new Notification("Данные успешно отправлены!");
+				}
+			};
+			xhr.send(JSON.stringify(data));
+			*/
+		}
+	</script>
+</body>
+
+</html>
