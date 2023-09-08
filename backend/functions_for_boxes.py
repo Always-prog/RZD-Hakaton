@@ -49,7 +49,7 @@ def summator_delta_centermass():
     pass
 
 
-def gravity_offset(carriage_len,cargo_len,lst_cargo,CHANGE_ME=1):
+def gravity_offset(carriage_len,cargo_len,lst_cargo):
     """Смещение ЦТ грузов в вагоне"""
     center_mass = cargo_len / 2
     delta_center_mass = (0.5 * (carriage_len))
@@ -58,8 +58,8 @@ def gravity_offset(carriage_len,cargo_len,lst_cargo,CHANGE_ME=1):
     return delta_center_mass
 
 
-def gravity_height(cargo_height:list, cargo_veight:list, lst_cargo):
-    """Общая высота ЦТ"""
+def gravity_height(cargo_height:list, cargo_veight:list, lst_cargo:dict):
+    """Общая высота ЦТ грузов в вагоне"""
     res_1 = 0
     for i in range(0,len(cargo_height)-1):
         res_1 += cargo_height * 0.5 * cargo_veight
@@ -67,8 +67,19 @@ def gravity_height(cargo_height:list, cargo_veight:list, lst_cargo):
     return res_1
 
 
-def cargo_stability(cargo_height:list, cargo_veight:list, types_platform):
+def cargo_stability(cargo_height:list, cargo_veight:list, types_platform, type:str, lst_cargo:dict):
+    """Общая высота ценра тяжести вагона. type - выбранная платформа."""
+    res_1 = 0
+    platform = types_platform(type)
+    res_1 += gravity_height(cargo_height, cargo_veight, lst_cargo) + (platform(2) * platform(3))
+    res_1 = res_1 / (summator_mass(lst_cargo) + platform(2))
 
+    return res_1
+
+
+def windward_surface():
+    """Расчёт наветренной поверхности. Пункт 3.2"""
+    pass
 
 
 
