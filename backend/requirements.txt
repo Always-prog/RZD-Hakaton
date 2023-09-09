@@ -1,5 +1,8 @@
 flask
 aspose-pdf
+numpy
+pandas
+stl
 
 
 # Для Linux машин потребуется установить шрифты

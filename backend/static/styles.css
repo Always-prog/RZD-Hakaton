@@ -1,0 +1,19 @@
+.header{
+	text-align: center;
+}
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: auto;
+}
+
+select {
+	display: block;
+}
+
+th,
+td {
+	padding: 7px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+}

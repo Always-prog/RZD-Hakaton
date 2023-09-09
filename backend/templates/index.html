@@ -3,62 +3,42 @@
 
 <head>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	<link rel="stylesheet" href={{ url_for('static', filename=styles[0]) }}>
 	<title>Характеристики груза</title>
-	<style>
-		.header{
-			text-align: center;
-		}
-		table {
-			width: 100%;
-			border-collapse: collapse;
-			margin: auto;
-		}
-
-		select {
-			display: block;
-		}
-
-		th,
-		td {
-			padding: 7px;
-			text-align: left;
-			border-bottom: 1px solid #ddd;
-		}
-	</style>
 </head>
 
 <body>
 	<h2 class="header">Характеристики груза</h2>
-		<table id="cargo_table" class="responsive-table striped">
-			<thead >
-				<tr>
-					<th>№ п/п</th>
-					<th>№ груза</th>
-					<th>Наименование груза</th>
-					<th>Длина (мм)</th>
-					<th>Ширина (мм)</th>
-					<th>Высота (мм)</th>
-					<th>Кол-во (шт)</th>
-					<th>Вес 1 ед (кг)</th>
-					<th>Материал упаковки</th>
-					<th>Общий вес (кг)</th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
+	<table id="cargo_table" class="responsive-table striped">
+		<thead>
+			<tr>
+				<th>№ п/п</th>
+				<th>№ груза</th>
+				<th>Наименование груза</th>
+				<th>Длина (мм)</th>
+				<th>Ширина (мм)</th>
+				<th>Высота (мм)</th>
+				<th>Кол-во (шт)</th>
+				<th>Вес 1 ед (кг)</th>
+				<th>Материал упаковки</th>
+				<th>Общий вес (кг)</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
 
-	<button class="btn waves-effect waves-light" onclick="addRow()">Добавить строку</button>
-	<!-- <button class="btn waves-effect waves-light" onclick="sendData()">Отправить данные</button> -->
-	<button class="btn waves-effect waves-light" onclick="getFile('/download/download_scheme', 'Схема.pdf')">Скачать схему</button>
-	<button class="btn waves-effect waves-light" onclick="getFile('/download/download_RPZ', 'РПЗ.pdf')">Скачать РПЗ</button>
+	<button id='add_row_btn' class="btn waves-effect waves-light" onclick="addRow()">Добавить строку</button>
+	<button id='download_scheme_btn' class="btn waves-effect waves-light">Скачать схему</button>
+	<button id='download_RPZ_btn' class="btn waves-effect waves-light">Скачать РПЗ</button>
+	<button id='download_stl_btn' class="btn waves-effect waves-light">Скачать 3D модель</button>
+	<br>
+	<div id="scene-container"></div>
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+	<script type="module" src="{{ url_for('static', filename=scripts[0]) }}"></script>
+	<script type="module" src="{{ url_for('static', filename=scripts[1]) }}"></script>
 	<script>
-		/* Inserts a new row into the table with the class "cargo_table".
-		The row contains cells with various data, including a number, cargo number, and input fields.
-		The total weight of the cargo is calculated based on the quantity and weight input values.
-		The function listens for input events on the quantity and weight input fields and updates the total weight cell accordingly.
-		*/
 		function addRow() {
 			const table = document.querySelector("#cargo_table");
 			const row = table.insertRow(table.rows.length);
@@ -75,138 +55,40 @@
 				cell.innerHTML = "<input type='text'>";
 				cells.push(cell);
 			}
-			let materials = {{ materials_list|tojson }};
-			let innerHTML = "<select required='required' class='box_material'><option value=''>Выберите значение</option>";
-			for (let i = 0; i < materials.length; i++) {
-				innerHTML += "<option value='" +i + "'>" + materials[i] + "</option>";
+			let materials = {{ materials_list| tojson }};
+		let innerHTML = "<select required='required' class='box_material'><option value=''>Выберите значение</option>";
+		for (let i = 0; i < materials.length; i++) {
+			innerHTML += "<option value='" + i + "'>" + materials[i] + "</option>";
+		}
+		innerHTML += "</select>";
+		const box_material_cell = row.insertCell(8);
+		box_material_cell.innerHTML = innerHTML;
+		cells.push(box_material_cell);
+
+		const total_weight_cell = row.insertCell(9);
+		total_weight_cell.innerHTML = "<th class='total_weight'>0</th>";
+		cells.push(total_weight_cell);
+		const updateTotalWeight = function () {
+			const quantity = parseFloat(cells[6].querySelector("input").value);
+			const weight = parseFloat(cells[7].querySelector("input").value);
+			if (!isNaN(quantity) && !isNaN(weight)) {
+				cells[9].innerHTML = `<th>${quantity * weight}</th>`;
+			} else {
+				cells[9].innerHTML = `<th>0</th>`;
 			}
-			innerHTML += "</select>";
-			const box_material_cell = row.insertCell(8);
-			box_material_cell.innerHTML = innerHTML;
-			cells.push(box_material_cell);
+		};
 
-			const total_weight_cell = row.insertCell(9);
-			total_weight_cell.innerHTML = "<th class='total_weight'>0</th>";
-			cells.push(total_weight_cell);
-			const updateTotalWeight = function () {
-				const quantity = parseFloat(cells[6].querySelector("input").value);
-				const weight = parseFloat(cells[7].querySelector("input").value);
-				if (!isNaN(quantity) && !isNaN(weight)) {
-					cells[9].innerHTML = `<th>${quantity * weight}</th>`;
-				} else {
-					cells[9].innerHTML = `<th>0</th>`;
-				}
-			};
+		cells[6].addEventListener("input", updateTotalWeight);
+		cells[7].addEventListener("input", updateTotalWeight);
 
-			cells[6].addEventListener("input", updateTotalWeight);
-			cells[7].addEventListener("input", updateTotalWeight);
-
-			const delete_button_cell = row.insertCell(cellNumber);
-			delete_button_cell.innerHTML = "<button class='btn waves-effect waves-light' onclick='deleteRow(this)'>Удалить</button>";
+		const delete_button_cell = row.insertCell(cellNumber);
+		delete_button_cell.innerHTML = "<button class='btn waves-effect waves-light' onclick='deleteRow(this)'>Удалить</button>";
 		}
 
 		function deleteRow(button) {
 			const table = document.querySelector("#cargo_table");
 			const row = button.parentNode.parentNode;
 			table.deleteRow(row.rowIndex);
-		}
-
-		function getFile (link, file_name) {
-			const data = getCargoData();
-			fetch(link, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(data)
-			})
-			.then(response => response.blob())
-			.then(blob => {
-				const url = URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = url;
-				a.download = file_name;
-				document.body.appendChild(a);
-				a.click();
-				document.body.removeChild(a);
-				URL.revokeObjectURL(url);
-			})
-			.catch(error => {
-				// Handle error
-				console.error(error);
-			});
-		}
-
-		function getCargoData() {
-			const table = document.querySelector("#cargo_table");
-			const rows = table.rows;
-			const data = [];
-
-			for (let i = 0; i < rows.length; i++) {
-				const row = rows[i];
-				const cells = row.cells;
-				const rowData = [];
-				let offset = 0
-				if (i > 0) {
-					offset = 1
-				}
-
-				for (let j = 0; j < cells.length - offset; j++) {
-					const cell = cells[j];
-					let value = "";
-					if (cell.querySelector("input")){
-						value = cell.querySelector("input").value
-					}
-					else if (cell.querySelector("select")) {
-						value = cell.querySelector("select").value
-					}
-					else {
-						value = cell.innerHTML
-					}
-					rowData.push(value);
-				}
-
-				data.push(rowData);
-			}
-			return data
-		}
-		// Sends the data from a HTML table to a specified URL via a POST request.
-		function sendData() {
-			const table = document.querySelector("#cargo_table");
-			const rows = table.rows;
-			const data = [];
-
-			for (let i = 0; i < rows.length; i++) {
-				const row = rows[i];
-				const cells = row.cells;
-				const rowData = [];
-
-				for (let j = 0; j < cells.length; j++) {
-					const cell = cells[j];
-					const value = cell.querySelector("input") ? cell.querySelector("input").value : cell.innerHTML;
-					rowData.push(value);
-				}
-
-				data.push(rowData);
-			}
-			fetch("/result", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify(data)
-			})
-				.then(response => response.json())
-				.then(data => {
-					if (data.message == "OK"){
-						const showFilesElement = document.getElementById("show_files");
-						showFilesElement.value = "true"
-					}
-				})
-				.catch(error => {
-					// Handle error
-					console.error(error);
-				});
 		}
 	</script>
 </body>
