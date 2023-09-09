@@ -1,12 +1,12 @@
 import pandas as pd
-
+import random
 import functions_for_boxes as bx
 
 # Test_cargo_set
-lst_cargo_weight = [6670, 4085, 395, 1865] * 3  # Веса грузов
-lst_cargo_len = [3650, 3870, 1080, 4100] * 3  # Длинна грузов
-lst_cargo_height = [1500, 1020, 390, 1865] * 3  # Высота грузов
-lst_cargo_width = [3320, 2890, 1580, 1720] * 3  # Ширина грузов
+lst_cargo_weight = [6670, 4085, 395, 1865] * 5  # Веса грузов
+lst_cargo_len = [3650, 3870, 1080, 4100] * 5  # Длинна грузов
+lst_cargo_height = [1500, 1020, 390, 1865] * 5  # Высота грузов
+lst_cargo_width = [3320, 2890, 1580, 1720] * 5  # Ширина грузов
 
 cargos = [{'weight': lst_cargo_weight[i], 'length': lst_cargo_len[i], 'height': lst_cargo_height[i],
            'width': lst_cargo_width[i]} for i in range(len(lst_cargo_weight))]
@@ -152,13 +152,31 @@ def square(cargo):
     return (-cargo[1][0] * cargo[1][1])
 
 
+def optimize_platforms(cargos):
+    min_platforms = len(cargos)
+    for i in range(500):
+        platforms = len(select_platforms_by_cargos(cargos))
+        random.shuffle(cargos)
+        if platforms < min_platforms:
+            min_platforms = platforms
+
+        for i in range(500):
+            random.shuffle(cargos)
+            platforms = select_platforms_by_cargos(cargos)
+            if len(platforms) == min_platforms:
+                return platforms
+        #Резервный вариант
+        return platforms
+
+
 if __name__ == '__main__':
     cargo = info_cargo(lst_cargo_weight, lst_cargo_len, lst_cargo_width, lst_cargo_height)
     import json
 
     # print([p['type'] for p in select_platforms_by_cargos(cargos)])
-    print(json.dumps(select_platforms_by_cargos(cargos), indent=3))
+    #print(json.dumps(select_platforms_by_cargos(cargos), indent=3))
     # my_lst.sort(key=square)
     # print(cargo)
-    # print('-' * 20)
-    # print(create_platforms_with_cargo(cargo))
+    print('-' * 20)
+    print(len(optimize_platforms(cargos)))
+
