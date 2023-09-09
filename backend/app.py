@@ -17,12 +17,14 @@ def index():
     materials_list = []
     with open('./materials.json', 'r') as f:
         materials_list = json.load(f)
+
     styles = ['styles.css']
     scripts = ['script.js', 'script_three.js']
     return render_template('index.html',
                             materials_list=materials_list,
                             styles=styles,
-                            scripts=scripts)
+                            scripts=scripts,
+                            excel_data = None)
 
 
 @app.route('/download/download_scheme', methods=['POST'])
@@ -56,6 +58,16 @@ def get_stl():
     data = stl_generator.create_cube_set(config)
     return data
 
+
+@app.route('/upload_excel', methods=['POST'])
+def upload_excel():
+    excel_data = pd.read_excel(request.files['file'])
+    materials_list = []
+    with open('./materials.json', 'r') as f:
+        materials_list = json.load(f)
+    excel_data['Материал упаковки'] = excel_data['Материал упаковки'].map(lambda x: materials_list.index(x))
+    excel_data = excel_data.to_dict('records')
+    return excel_data, 200
 
 if __name__ == '__main__':
     app.run()

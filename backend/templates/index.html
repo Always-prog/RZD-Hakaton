@@ -12,7 +12,6 @@
 	<table id="cargo_table" class="responsive-table striped">
 		<thead>
 			<tr>
-				<th>№ п/п</th>
 				<th>№ груза</th>
 				<th>Наименование груза</th>
 				<th>Длина (мм)</th>
@@ -31,7 +30,8 @@
 	<button id='download_scheme_btn' class="btn waves-effect waves-light">Скачать схему</button>
 	<button id='download_RPZ_btn' class="btn waves-effect waves-light">Скачать РПЗ</button>
 	<button id='download_stl_btn' class="btn waves-effect waves-light">Скачать 3D модель</button>
-	<br>
+	<br><br>
+	<button id='upload_excel_btn' class="btn waves-effect waves-light red">Загрузить Excel</button>
 	<div id="scene-container"></div>
 
 
@@ -39,57 +39,107 @@
 	<script type="module" src="{{ url_for('static', filename=scripts[0]) }}"></script>
 	<script type="module" src="{{ url_for('static', filename=scripts[1]) }}"></script>
 	<script>
-		function addRow() {
+
+		function addRow(row_data=null) {
 			const table = document.querySelector("#cargo_table");
 			const row = table.insertRow(table.rows.length);
 			const cellNumber = table.rows[0].cells.length;
 			let cells = [];
-			const number_pp_cell = row.insertCell(0);
-			number_pp_cell.innerHTML = "<th class='number_pp'>" + (table.rows.length - 1) + "</th>";
-			cells.push(number_pp_cell);
-			const cargo_number_cell = row.insertCell(1);
+			const cargo_number_cell = row.insertCell(0);
 			cargo_number_cell.innerHTML = "<th class='cargo_number'>" + (table.rows.length - 1) + "</th>";
 			cells.push(cargo_number_cell);
-			for (let index = 2; index < cellNumber - 2; index++) {
+			for (let index = 1; index < cellNumber - 2; index++) {
 				const cell = row.insertCell(index);
 				cell.innerHTML = "<input type='text'>";
 				cells.push(cell);
 			}
-			let materials = {{ materials_list| tojson }};
-		let innerHTML = "<select required='required' class='box_material'><option value=''>Выберите значение</option>";
-		for (let i = 0; i < materials.length; i++) {
-			innerHTML += "<option value='" + i + "'>" + materials[i] + "</option>";
-		}
-		innerHTML += "</select>";
-		const box_material_cell = row.insertCell(8);
-		box_material_cell.innerHTML = innerHTML;
-		cells.push(box_material_cell);
-
-		const total_weight_cell = row.insertCell(9);
-		total_weight_cell.innerHTML = "<th class='total_weight'>0</th>";
-		cells.push(total_weight_cell);
-		const updateTotalWeight = function () {
-			const quantity = parseFloat(cells[6].querySelector("input").value);
-			const weight = parseFloat(cells[7].querySelector("input").value);
-			if (!isNaN(quantity) && !isNaN(weight)) {
-				cells[9].innerHTML = `<th>${quantity * weight}</th>`;
-			} else {
-				cells[9].innerHTML = `<th>0</th>`;
+			let materials = {{ materials_list| tojson}};
+			let innerHTML = "<select required='required' class='box_material'><option value=''>Выберите значение</option>";
+			for (let i = 0; i < materials.length; i++) {
+				innerHTML += "<option value='" + i + "'>" + materials[i] + "</option>";
 			}
-		};
+			innerHTML += "</select>";
+			const box_material_cell = row.insertCell(7);
+			box_material_cell.innerHTML = innerHTML;
+			cells.push(box_material_cell);
 
-		cells[6].addEventListener("input", updateTotalWeight);
-		cells[7].addEventListener("input", updateTotalWeight);
+			const total_weight_cell = row.insertCell(8);
+			total_weight_cell.innerHTML = "<th class='total_weight'>0</th>";
+			cells.push(total_weight_cell);
+			const updateTotalWeight = function () {
+				const quantity = parseFloat(cells[5].querySelector("input").value);
+				const weight = parseFloat(cells[6].querySelector("input").value);
+				if (!isNaN(quantity) && !isNaN(weight)) {
+					cells[8].innerHTML = `<th>${quantity * weight}</th>`;
+				} else {
+					cells[8].innerHTML = `<th>0</th>`;
+				}
+			};
 
-		const delete_button_cell = row.insertCell(cellNumber);
-		delete_button_cell.innerHTML = "<button class='btn waves-effect waves-light' onclick='deleteRow(this)'>Удалить</button>";
+			cells[5].addEventListener("input", updateTotalWeight);
+			cells[6].addEventListener("input", updateTotalWeight);
+
+			const delete_button_cell = row.insertCell(cellNumber);
+			delete_button_cell.innerHTML = "<button class='btn waves-effect waves-light' onclick='deleteRow(this)'>Удалить</button>";
+			updateCargoNumbers();
+			if (row_data) {
+				for (let i = 1; i < cells.length; i++) {
+					if (cells[i].querySelector("input") || cells[i].querySelector("select")) {
+						const inputOrSelect = cells[i].querySelector("input") || cells[i].querySelector("select");
+						inputOrSelect.value = row_data[table.rows[0].cells[i].innerHTML];
+					}
+				}
+				updateTotalWeight();
+			}
 		}
 
 		function deleteRow(button) {
 			const table = document.querySelector("#cargo_table");
 			const row = button.parentNode.parentNode;
 			table.deleteRow(row.rowIndex);
+			updateCargoNumbers();
 		}
+
+		function updateCargoNumbers() {
+			const cargoNumberCells = document.querySelectorAll(".cargo_number");
+			cargoNumberCells.forEach(function(cell, index) {
+				cell.innerText = index + 1;
+			});
+		}
+
+	document.getElementById('upload_excel_btn').addEventListener('click', function () {
+		// Create a file input element
+		var input = document.createElement('input');
+		input.type = 'file';
+
+		// Trigger the file input dialog
+		input.click();
+
+		// Handle the file selection
+		input.addEventListener('change', function () {
+			var file = input.files[0];
+
+			// Create a FormData object to send the file to the backend
+			var formData = new FormData();
+			formData.append('file', file);
+
+			// Send the file to the backend using an HTTP request
+			var request = new XMLHttpRequest();
+			request.open('POST', '/upload_excel', true);
+			request.onload = function () {
+				if (request.status === 200) {
+					var response = JSON.parse(request.responseText);
+					response.forEach(function (item) {
+						addRow(item);
+					})
+					console.log('File uploaded successfully');
+				} else {
+					console.error('File upload failed');
+				}
+			};
+			request.send(formData);
+		});
+	});
 	</script>
 </body>
 
