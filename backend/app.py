@@ -1,9 +1,13 @@
+import zipfile
+from io import BytesIO
+
 from flask import Flask, render_template, request
 import pandas as pd
 import json
 import stl_generator
 
-from report_generator import get_rpz_report
+from platforms_stuff import parse_cargos, select_platforms_by_cargos
+from report_generator import get_rpz_reports
 
 app = Flask(__name__)
 
@@ -33,21 +37,22 @@ def download_scheme():
 
 @app.route('/download/download_RPZ', methods=['POST'])
 def download_RPZ():
-    input_data = request.json
-    df_data = pd.DataFrame(
-        input_data[1:],
-        columns=input_data[0],
-        dtype=pd.Int32Dtype)
-    rpz_report = get_rpz_report(df_data)
-    return rpz_report
+    cargos = parse_cargos(request.json)
+    rpz_report = get_rpz_reports(cargos)
+
+    zip_buffer = BytesIO()
+    zip_buffer.seek(0)
+    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
+        for file_name, data in [(f'№{i}-РПЗ-Вагон.pdf', file) for i, file in enumerate(rpz_report)]:
+            zip_file.writestr(file_name, data)
+
+    return zip_buffer.getvalue()
 
 
 @app.route('/get_stl', methods=['POST'])
 def get_stl():
-    config = dict()
-    with open("./размещенный_груз_и_платформы.json", "rb") as f:
-        data = f.read()
-        config = json.loads(data)
+    cargos = parse_cargos(request.json)
+    config = select_platforms_by_cargos(cargos)
     data = stl_generator.create_cube_set(config)
     return data
 

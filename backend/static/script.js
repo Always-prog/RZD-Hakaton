@@ -63,7 +63,7 @@ document.getElementById("download_scheme_btn").onclick = function () {
 };
 
 document.getElementById("download_RPZ_btn").onclick = function () {
-	getFile('/download/download_RPZ', 'РПЗ.pdf');
+	getFile('/download/download_RPZ', 'РПЗ-вагонов.zip');
 };
 
 document.getElementById("download_stl_btn").onclick = function () {
