@@ -89,9 +89,11 @@ def windward_surface(lst_cargo):
     pass
 
 
-def func_4_1(type_hard:bool, lst_cargo_veight:list):
-    """type_hard = True, если крепление жёсткое, и False в противном случае.
-    Продольная инерционная сила"""
+def longitudinal_inertial_force_func_4_1(type_hard: bool, lst_cargo_veight: list):
+    """
+    ПРОДОЛЬНАЯ ИНЕРЦИОННАЯ СИЛА
+    type_hard = True, если крепление жёсткое, и False в противном случае.
+    """
     res = 0
     my_res = []
 
@@ -106,18 +108,21 @@ def func_4_1(type_hard:bool, lst_cargo_veight:list):
     res = a_22 - ((veight * (a_22 - a_94)) / 72)
 
     for cargo in lst_cargo_veight:
-        my_res.append(res*(cargo / 1000))
-        print(res*(cargo / 1000))
+        my_res.append(res * (cargo / 1000))
+        print(res * (cargo / 1000))
 
     return my_res
 
 
-def func_4_2(carriage_len:int): #FIXME
+def transverse_inertial_force_func_4_2(carriage_len: int):  # FIXME
     """Поперечная инерционная сила"""
     pass
 
 
-def func_4_5(lst_cargo_veight,lst_cargo_material):
+def friction_force_in_the_longitudinal_direction_func_4_5(lst_cargo_veight, lst_cargo_material):
+    """
+    Сила трения в продольном направлении
+    """
     pass
 
 
