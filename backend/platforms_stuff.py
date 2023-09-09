@@ -1,6 +1,7 @@
 import pandas as pd
-import random
 import functions_for_boxes as bx
+import random
+random.seed(1)
 
 # Test_cargo_set
 lst_cargo_weight = [6670, 4085, 395, 1865] * 5  # Веса грузов
@@ -54,6 +55,7 @@ def select_platforms_by_cargos(cargos):
     """
     Распределитель грузов по вагонам
     """
+    random.shuffle(cargos)
 
     LIMIT_CARGOS_MASS = 50000  # 50 ТОНН.
     DEFAULT_PLATFORM = '13-401'
@@ -123,6 +125,27 @@ def select_platforms_by_cargos(cargos):
             **types_platform[current_platform_type],
             'cargos': current_cargos.copy()
         })
+
+    # Сортируем тяжелые ящики к центру
+    for n, platform in enumerate(platforms):
+        platform_cargos = platform['cargos'].copy()
+        # Сортируем грузы по весу в порядке убывания
+        sorted_cargos = sorted(platform_cargos, key=lambda x: x['weight'])
+        # Помещяем в центр самые тяжелые
+        highest_in_middle = sorted_cargos[len(sorted_cargos) % 2::2] + sorted_cargos[::-2]
+
+        # Список для хранения размещенных грузов с координатами
+        placed_cargos = []
+
+        x = 0
+        for cargo in highest_in_middle:
+            placed_cargos.append({
+                **cargo,
+                'x': x
+            })
+            x += bx.SPACE + cargo['length']
+
+        platforms[n]['cargos'] = placed_cargos
 
     return platforms
 
