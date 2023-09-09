@@ -1,10 +1,10 @@
 import functions_for_boxes as bx
 
-#Test_cargo_set
+# Test_cargo_set
 lst_cargo_weight = [6670, 4085, 395, 1865] * 5  # Веса грузов
-lst_cargo_len = [3650, 3870, 1080, 4100]  * 5 # Длинна грузов
-lst_cargo_height = [1500, 1020, 390, 1865]  * 5 # Высота грузов
-lst_cargo_width = [3320, 2890, 1580, 1720]  * 5# Ширина грузов
+lst_cargo_len = [3650, 3870, 1080, 4100] * 5  # Длинна грузов
+lst_cargo_height = [1500, 1020, 390, 1865] * 5  # Высота грузов
+lst_cargo_width = [3320, 2890, 1580, 1720] * 5  # Ширина грузов
 
 cargos = [{'weight': lst_cargo_weight[i], 'length': lst_cargo_len[i], 'height': lst_cargo_height[i],
            'width': lst_cargo_width[i]} for i in range(len(lst_cargo_weight))]
@@ -41,7 +41,7 @@ def create_platforms_with_cargo(cargo):
             print("Ограничения по вместимости.")
             break
 
-        #print(f"Общая масса равна: {mass}. Общая длинна: {cargo_len}")
+        # print(f"Общая масса равна: {mass}. Общая длинна: {cargo_len}")
         i += 1
 
     if cargo_len <= 13400:
@@ -52,9 +52,9 @@ def create_platforms_with_cargo(cargo):
         print("Критическая ошибка.")
         return False
 
-    #print(cargo_coords)
+    # print(cargo_coords)
     for i in range(0, len(cargo) - 1):
-        platform.append((cargo[i],cargo_coords[i]))
+        platform.append((cargo[i], cargo_coords[i]))
 
     return platform, platform_type
 
@@ -132,6 +132,7 @@ def select_platforms_by_cargos(cargos):
 
     return platforms
 
+
 def gabarites(lst_cargo_len, lst_cargo_width, lst_cargo_height):
     res = []
     for i in range(0, len(lst_cargo_height)):
@@ -151,16 +152,18 @@ def info_cargo(lst_cargo_weight, lst_cargo_len, lst_cargo_width, lst_cargo_heigh
 def veight(cargo):
     return -cargo[0]
 
+
 def square(cargo):
     print(cargo[1][0] * cargo[1][1])
-    return(-cargo[1][0] * cargo[1][1])
+    return (-cargo[1][0] * cargo[1][1])
 
 
 if __name__ == '__main__':
     cargo = info_cargo(lst_cargo_weight, lst_cargo_len, lst_cargo_width, lst_cargo_height)
     import json
+
     print(json.dumps(select_platforms_by_cargos(cargos), indent=3))
-    #my_lst.sort(key=square)
+    # my_lst.sort(key=square)
     # print(cargo)
     # print('-' * 20)
     # print(create_platforms_with_cargo(cargo))
