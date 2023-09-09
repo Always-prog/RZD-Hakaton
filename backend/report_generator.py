@@ -1,7 +1,7 @@
 from io import BytesIO
-
+import functions_for_boxes as bx
 import aspose.pdf as ap
-
+import random
 from platforms_stuff import select_platforms_by_cargos
 
 
@@ -14,9 +14,19 @@ def get_rpz_reports(cargos) -> list[bytes]:
 
     platforms = select_platforms_by_cargos(cargos)
     for platform in platforms:
+
+        lst_height = [cargo['height'] for cargo in platform['cargos']]
+        lst_weight = [cargo['weight'] for cargo in platform['cargos']]
+        # type_hard = random.randint(1,10)
+        # if type_hard > 3:
+        #     type_hard = True
+        # else:
+        #     type_hard = False
+
+
         replacements = {
-            'gravity_height': 'gravity_height',
-            'func_4_1': 'func_4_1'
+            # 'Func_four': str(bx.longitudinal_inertial_force_func_4_1(type_hard, lst_weight)),
+            'gravity_height': str(bx.gravity_height(lst_height, lst_weight))
         }
         # Load the template
         document = ap.Document("files/503р-template.pdf")
