@@ -44,7 +44,7 @@ def create_platforms_with_cargo(cargo):
 
     if cargo_len <= 13400:
         platform_type = "13-401"
-    elif cargo_len <=:
+    elif cargo_len <= 18400:
         platform_type =
 
 
@@ -79,4 +79,4 @@ if __name__ == '__main__':
     #my_lst.sort(key=square)
     print(cargo)
     print('-' * 20)
-    create_platforms_with_cargo(cargo)
+    print(create_platforms_with_cargo(cargo))

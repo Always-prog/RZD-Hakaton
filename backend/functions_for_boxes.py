@@ -35,24 +35,6 @@ def main():
     pass
 
 
-def choice_platform(types_platform, lst_cargo_veight, lst_cargo_len):
-    """
-    Выбирает платформу в зависимости от груза. Принимает список всех
-    весов грузов и список всех длин грузов.
-    """
-    pass
-    all_platforms = []
-    return all_platforms
-
-carriage_len = choice_platform(types_platform, lst_cargo_veight, lst_cargo_len)
-
-"""def summator_mass(lst_cargo_veight:list):
-    
-    Подсчёт массы всех грузов. Заменить на sum(lst_cargo_veight).
-    
-    return sum(lst_cargo_veight)"""
-
-
 def summator_delta_centermass():
     """
     Должна возвращать суммарное отклонение центра масс.
@@ -71,12 +53,12 @@ def gravity_offset(carriage_len,cargo_len,lst_cargo_veight): #FIXME
     return delta_center_mass
 
 
-def gravity_height(cargo_height, cargo_veight, lst_cargo_veight:list):
+def gravity_height(lst_cargo_height, lst_cargo_weight):
     """Общая высота ЦТ грузов в вагоне"""
     res_1 = 0
-    for i in range(0,len(cargo_height)-1):
-        res_1 += cargo_height * 0.5 * cargo_veight
-    res_1 = res_1 / sum(lst_cargo_veight)
+    for i in range(0,len(lst_cargo_height)-1):
+        res_1 += lst_cargo_height[i] * 0.5 * (lst_cargo_weight[i]/1000)
+    res_1 = res_1 / (sum(lst_cargo_weight)/1000)
     return res_1
 
 
@@ -85,7 +67,7 @@ def cargo_stability(cargo_height:list, lst_cargo_veight:list, types_platform, ty
     #ПЕРЕДЕЛАТЬ СОГЛАСНО НОВЫМ ВХОДНЫМ ДАННЫМ
     res_1 = 0
     platform = types_platform(type)
-    res_1 += gravity_height(cargo_height, cargo_veight, lst_cargo) + (platform(2) * platform(3))
+    res_1 += gravity_height(cargo_height, lst_cargo_veight) + (platform(2) * platform(3))
     res_1 = res_1 / (sum(lst_cargo_veight) + platform(2))
     if res_1 < 2300:
         return res_1
@@ -135,3 +117,5 @@ def func_4_5(lst_cargo_veight,lst_cargo_material):
 if __name__ == '__main__':
     print(sum(lst_cargo_veight))
     print(func_4_1(False,lst_cargo_veight)) #Подсчёт продольной инерции для каждого груза
+
+    print(gravity_height(lst_cargo_height, lst_cargo_veight))
