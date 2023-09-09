@@ -8,7 +8,8 @@ def get_rpz_report(wares) -> bytes:
     wares: Данные о грузах
     """
     replacements = {
-        'total_ct_in_van': 'наша формула успешно отработала'
+        'gravity_height': 'gravity_height',
+        'func_4_1': 'func_4_1'
     }
     # Load the template
     document = ap.Document("files/503р-template.pdf")
