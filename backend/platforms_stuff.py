@@ -1,17 +1,53 @@
+import pandas as pd
+
 import functions_for_boxes as bx
 
 # Test_cargo_set
-lst_cargo_weight = [6670, 4085, 395, 1865] * 5  # Веса грузов
-lst_cargo_len = [3650, 3870, 1080, 4100] * 5  # Длинна грузов
-lst_cargo_height = [1500, 1020, 390, 1865] * 5  # Высота грузов
-lst_cargo_width = [3320, 2890, 1580, 1720] * 5  # Ширина грузов
+lst_cargo_weight = [6670, 4085, 395, 1865] * 3  # Веса грузов
+lst_cargo_len = [3650, 3870, 1080, 4100] * 3  # Длинна грузов
+lst_cargo_height = [1500, 1020, 390, 1865] * 3  # Высота грузов
+lst_cargo_width = [3320, 2890, 1580, 1720] * 3  # Ширина грузов
 
 cargos = [{'weight': lst_cargo_weight[i], 'length': lst_cargo_len[i], 'height': lst_cargo_height[i],
            'width': lst_cargo_width[i]} for i in range(len(lst_cargo_weight))]
 
-# Test_cargo_set_2
+materials = [
+    "дерево",
+    "сталь",
+    "пакеты чушек свинца, цинка",
+    "пакеты отливок алюминия",
+    "железобетон",
+    "вертикально устанавливаемые рулоны листовой стали",
+    "пачки промасленной листовой стали"
+]
 
-cargo_list = []
+
+def parse_cargos(data):
+    # Создаем DataFrame из данных
+    df = pd.DataFrame(data[1:], columns=data[0])
+
+    # Преобразуем столбцы с количеством штук, весом и размерами в числовой формат
+    df[['Кол-во (шт)', 'Длина (мм)', 'Ширина (мм)', 'Высота (мм)', 'Вес 1 ед (кг)']] = df[
+        ['Кол-во (шт)', 'Длина (мм)', 'Ширина (мм)', 'Высота (мм)', 'Вес 1 ед (кг)']].apply(pd.to_numeric)
+
+    # Создаем список грузов на основе данных в DataFrame
+    cargo_list = []
+    for _, row in df.iterrows():
+        cargo = {
+            'weight': row['Вес 1 ед (кг)'],
+            'length': row['Длина (мм)'],
+            'width': row['Ширина (мм)'],
+            'height': row['Высота (мм)']
+        }
+        cargo_info = {
+            'name': row['Наименование груза'],
+            'packet_material': materials[int(row['Материал упаковки'])]
+        }
+        cargo_list.extend([cargo] * row['Кол-во (шт)'])
+        for c in cargo_list:
+            c.update(cargo_info)
+
+    return cargo_list
 
 
 def select_platforms_by_cargos(cargos):
@@ -20,6 +56,7 @@ def select_platforms_by_cargos(cargos):
     """
 
     LIMIT_CARGOS_MASS = 50000  # 50 ТОНН.
+    DEFAULT_PLATFORM = '13-401'
 
     types_platform = {
         "13-401": {
@@ -44,10 +81,10 @@ def select_platforms_by_cargos(cargos):
     filter_unexpected = lambda cargo: cargo['length'] < LIMIT_CARGO_LENGTH and cargo['weight'] < LIMIT_CARGOS_MASS
 
     platforms = []
-    current_platform_type = '13-401'
+    current_platform_type = DEFAULT_PLATFORM
     current_cargos = []
     for cargo in filter(filter_unexpected, cargos):
-        total_cargos_length = sum([c['length'] for c in current_cargos])+(len(current_cargos) * bx.SPACE)
+        total_cargos_length = sum([c['length'] for c in current_cargos]) + (len(current_cargos) * bx.SPACE)
         total_cargos_mass = sum([c['weight'] for c in current_cargos])
 
         # Если груз становиться слишком тяжелым - добавляем на новую платформу
@@ -76,6 +113,7 @@ def select_platforms_by_cargos(cargos):
                     'cargos': current_cargos.copy()
                 })
                 current_cargos = []
+                current_platform_type = DEFAULT_PLATFORM
             continue
 
         current_cargos.append({**cargo, 'x': total_cargos_length, 'y': 0, 'z': 0})
@@ -118,6 +156,7 @@ if __name__ == '__main__':
     cargo = info_cargo(lst_cargo_weight, lst_cargo_len, lst_cargo_width, lst_cargo_height)
     import json
 
+    # print([p['type'] for p in select_platforms_by_cargos(cargos)])
     print(json.dumps(select_platforms_by_cargos(cargos), indent=3))
     # my_lst.sort(key=square)
     # print(cargo)
