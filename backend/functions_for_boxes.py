@@ -19,15 +19,17 @@ lst_cargo_len = [3650, 3870, 1080, 4100]
 lst_cargo_height = [1500, 1020, 390, 1865]
 lst_cargo_width = [3320, 2890, 1580, 1720]
 
-#Дистанция между грузами
-SPACE = 0
+lst_cargo_material = []
 
-#Название платформы : грузоподъёмность, длинна, вес вагона(тонны), высота центра тяжести вагона,
+#Дистанция между грузами в миллиметрах
+SPACE = 150
+
+#Название платформы : грузоподъёмность, длинна и ширина,  вес вагона(тонны), высота центра тяжести вагона,
 #площадь стороны, площадь платформы(верха)
 #
 #РАСШИРИТЬ НА ТЯЖЕЛЫЕ ПЛАТФОРМЫ И АДАПТИРОВАТЬ КОД
-types_platform = {"13-401" : (70, 13400, 20.92, 1810, 36841000), "13-Н451" : (63, 13400, 21.3, 1810, 36841000),
-                  "13-926" : (73, 18400, 27, 1807, 51789000)}
+types_platform = {"13-401" : (70, (13400, 2770), 20.92, 1810, 36841000),
+                  "13-926" : (73, (18400, 2830),27, 1807, 51789000)}
 
 def main():
     pass
@@ -44,11 +46,11 @@ def choice_platform(types_platform, lst_cargo_veight, lst_cargo_len):
 
 carriage_len = choice_platform(types_platform, lst_cargo_veight, lst_cargo_len)
 
-def summator_mass(lst_cargo_veight:list):
-    """
+"""def summator_mass(lst_cargo_veight:list):
+    
     Подсчёт массы всех грузов. Заменить на sum(lst_cargo_veight).
-    """
-    return sum(lst_cargo_veight)
+    
+    return sum(lst_cargo_veight)"""
 
 
 def summator_delta_centermass():
@@ -59,7 +61,7 @@ def summator_delta_centermass():
     pass
 
 
-def gravity_offset(carriage_len,cargo_len,lst_cargo_veight):
+def gravity_offset(carriage_len,cargo_len,lst_cargo_veight): #FIXME
     """Смещение ЦТ грузов в вагоне
     cargo_len is i lst_cargo_len -> lst_cargo_len[i]"""
     center_mass = lst_cargo_len / 2 #FIXME
@@ -69,7 +71,7 @@ def gravity_offset(carriage_len,cargo_len,lst_cargo_veight):
     return delta_center_mass
 
 
-def gravity_height(cargo_height:list, cargo_veight:list, lst_cargo_veight:list):
+def gravity_height(cargo_height, cargo_veight, lst_cargo_veight:list):
     """Общая высота ЦТ грузов в вагоне"""
     res_1 = 0
     for i in range(0,len(cargo_height)-1):
@@ -101,6 +103,7 @@ def func_4_1(type_hard:bool, lst_cargo_veight:list):
     """type_hard = True, если крепление жёсткое, и False в противном случае.
     Продольная инерционная сила"""
     res = 0
+    my_res = []
 
     if type_hard:
         a_22 = 1.9
@@ -111,13 +114,24 @@ def func_4_1(type_hard:bool, lst_cargo_veight:list):
 
     veight = sum(lst_cargo_veight) / 1000
     res = a_22 - ((veight * (a_22 - a_94)) / 72)
-    return res
+
+    for cargo in lst_cargo_veight:
+        my_res.append(res*(cargo / 1000))
+        print(res*(cargo / 1000))
+
+    return my_res
 
 
-def func_4_2():
+def func_4_2(carriage_len:int): #FIXME
     """Поперечная инерционная сила"""
+    pass
+
+
+def func_4_5(lst_cargo_veight,lst_cargo_material):
+    pass
+
 
 
 if __name__ == '__main__':
     print(sum(lst_cargo_veight))
-    print(func_4_1(False,lst_cargo_veight))
+    print(func_4_1(False,lst_cargo_veight)) #Подсчёт продольной инерции для каждого груза
