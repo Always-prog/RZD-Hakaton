@@ -129,8 +129,6 @@ def friction_force_in_the_longitudinal_direction_func_4_5(lst_cargo_veight, lst_
 
 if __name__ == '__main__':
     print(sum(lst_cargo_veight))
-    print(func_4_1(False,lst_cargo_veight)) #Подсчёт продольной инерции для каждого груза
+    print(longitudinal_inertial_force_func_4_1(False,lst_cargo_veight)) #Подсчёт продольной инерции для каждого груза
 
     print(gravity_height(lst_cargo_height, lst_cargo_veight))
-
-def func_4_6(friction_coefficient, lst_cargo_veight:list, ):
