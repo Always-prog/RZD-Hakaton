@@ -54,7 +54,7 @@ def create_cube_set(config):
         platform_width = float(config[i]["width"]) / 1000
         cargos = config[i]["cargos"]
         if i > 0:
-            current_platform_center[1] += 0.1 + ((float(config[i - 1]["length"]) / 1000) + platform_length) / 2
+            current_platform_center[1] += 1 + ((float(config[i - 1]["length"]) / 1000) + platform_length) / 2
 
         platform_cube = create_cube(
             current_platform_center,
