@@ -9,8 +9,9 @@ TODO:
 lst_cargo_veight - список весов всех грузов
 carriage_len - длинна вагона, для которого производится расчёт
 lst_cargo_len - список длин грузов
-
+friction_coefficient - коэффициент трения
 ПРОВЕРИЛИ = False
+TEST
 """
 
 #Тестовый набор значений. Допустим, имеется 4 груза.
@@ -18,8 +19,15 @@ lst_cargo_veight = [6670, 4085, 395, 1865]
 lst_cargo_len = [3650, 3870, 1080, 4100]
 lst_cargo_height = [1500, 1020, 390, 1865]
 lst_cargo_width = [3320, 2890, 1580, 1720]
+friction_coefficient = 0.5
 
-lst_cargo_material = []
+lst_cargo_material = {"дерево" : 0.45,
+	                  "сталь" : 0.40,
+	                  "пакеты чушек свинца, цинка" : 0.37,
+	                  "пакеты отливок алюминия" : 0.38,
+	                  "железобетон" : 0.55,
+	                  "вертикально устанавливаемые рулоны листовой стали" : 0.61,
+	                  "пачки промасленной листовой стали" : 0.21}
 
 #Дистанция между грузами в миллиметрах
 SPACE = 150
@@ -81,9 +89,11 @@ def windward_surface(lst_cargo):
     pass
 
 
-def func_4_1(type_hard:bool, lst_cargo_veight:list):
-    """type_hard = True, если крепление жёсткое, и False в противном случае.
-    Продольная инерционная сила"""
+def longitudinal_inertial_force_func_4_1(type_hard: bool, lst_cargo_veight: list):
+    """
+    ПРОДОЛЬНАЯ ИНЕРЦИОННАЯ СИЛА
+    type_hard = True, если крепление жёсткое, и False в противном случае.
+    """
     res = 0
     my_res = []
 
@@ -98,18 +108,21 @@ def func_4_1(type_hard:bool, lst_cargo_veight:list):
     res = a_22 - ((veight * (a_22 - a_94)) / 72)
 
     for cargo in lst_cargo_veight:
-        my_res.append(res*(cargo / 1000))
-        print(res*(cargo / 1000))
+        my_res.append(res * (cargo / 1000))
+        print(res * (cargo / 1000))
 
     return my_res
 
 
-def func_4_2(carriage_len:int): #FIXME
+def transverse_inertial_force_func_4_2(carriage_len: int):  # FIXME
     """Поперечная инерционная сила"""
     pass
 
 
-def func_4_5(lst_cargo_veight,lst_cargo_material):
+def friction_force_in_the_longitudinal_direction_func_4_5(lst_cargo_veight, lst_cargo_material):
+    """
+    Сила трения в продольном направлении
+    """
     pass
 
 
@@ -119,3 +132,5 @@ if __name__ == '__main__':
     print(func_4_1(False,lst_cargo_veight)) #Подсчёт продольной инерции для каждого груза
 
     print(gravity_height(lst_cargo_height, lst_cargo_veight))
+
+def func_4_6(friction_coefficient, lst_cargo_veight:list, ):

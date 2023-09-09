@@ -19,36 +19,41 @@ def create_platforms_with_cargo(cargo):
 
     x_cargo = -1 * (13400 / 2)
     y_cargo = 0
-    platforms = []
+    platform = []
     cargo_coords = []
     i = 0
     take_new_platform = False
     max_len = 13400
     x_cargo += cargo[0][1][0] / 2
-    while mass < MAX_MASS and cargo_len < 18400 and i < len(cargo) and not take_new_platform:
-        print(cargo[i])
+    cargo_coords.append((x_cargo, y_cargo))
+    while mass < MAX_MASS and cargo_len < 18400 and i < len(cargo):
         if mass + cargo[i][0] < MAX_MASS and cargo_len + cargo[i][1][0] + bx.SPACE < max_len:
             mass += cargo[i][0]
             cargo_len += cargo[i][1][0] + bx.SPACE
             x_cargo += cargo[i][1][0] + bx.SPACE
             if i > 1:
                 cargo_coords.append((x_cargo, y_cargo))
-            print((x_cargo, y_cargo))
         else:
             print("Ограничения по вместимости.")
             break
 
 
-        print(f"Общая масса равна: {mass}. Общая длинна: {cargo_len}")
+        #print(f"Общая масса равна: {mass}. Общая длинна: {cargo_len}")
         i += 1
 
     if cargo_len <= 13400:
         platform_type = "13-401"
     elif cargo_len <= 18400:
-        platform_type =
+        platform_type = "13-926"
+    else:
+        print("Критическая ошибка.")
+        return False
 
+    #print(cargo_coords)
+    for i in range(0, len(cargo) - 1):
+        platform.append((cargo[i],cargo_coords[i]))
 
-    return(platform)
+    return platform, platform_type
 
 def gabarites(lst_cargo_len, lst_cargo_width, lst_cargo_height):
     res = []
