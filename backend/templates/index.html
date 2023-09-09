@@ -35,6 +35,7 @@
 					<th>Высота (мм)</th>
 					<th>Кол-во (шт)</th>
 					<th>Вес 1 ед (кг)</th>
+					<!--<th>Материал упаковки</th>-->
 					<th>Общий вес (кг)</th>
 				</tr>
 			</thead>
@@ -69,6 +70,11 @@
 				cell.innerHTML = "<input type='text'>";
 				cells.push(cell);
 			}
+			/*
+			const box_material_cell = row.insertCell(8);
+			box_material_cell.innerHTML = "<select><option value='option1'>Option 1</option><option value='option2'>Option 2</option></select>";
+			cells.push(box_material_cell);
+			*/
 
 			const total_weight_cell = row.insertCell(8);
 			total_weight_cell.innerHTML = "<th class='total_weight'>0</th>";
@@ -85,6 +91,15 @@
 
 			cells[6].addEventListener("input", updateTotalWeight);
 			cells[7].addEventListener("input", updateTotalWeight);
+
+			const delete_button_cell = row.insertCell(cellNumber);
+			delete_button_cell.innerHTML = "<button class='btn waves-effect waves-light' onclick='deleteRow(this)'>Удалить</button>";
+		}
+
+		function deleteRow(button) {
+			const table = document.querySelector("#cargo_table");
+			const row = button.parentNode.parentNode;
+			table.deleteRow(row.rowIndex);
 		}
 
 		function getFile (link, file_name) {
