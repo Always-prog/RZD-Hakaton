@@ -1,0 +1,6 @@
+flask
+aspose-pdf
+
+
+# Для Linux машин потребуется установить шрифты
+# sudo apt-get install ttf-mscorefonts-installer

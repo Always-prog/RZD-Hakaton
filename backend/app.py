@@ -1,11 +1,18 @@
 from flask import Flask, render_template, request
 from flask import jsonify
+import json
+
+from report_generator import get_rpz_report
+
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', show_files=False)
+    materials_list = []
+    with open('./materials.json', 'r') as f:
+        materials_list = json.load(f)
+    return render_template('index.html', materials_list=materials_list)
 
 
 @app.route('/result', methods=['POST', 'GET'])
@@ -35,10 +42,8 @@ def download_file1():
 def download_file2():
     input_data = request.json
     print(input_data)
-    data = None
-    with open('./files/503р (1).pdf', 'rb') as f:
-        data = f.read()
-    return data
+    rpz_report = get_rpz_report(input_data)
+    return rpz_report
 
 
 if __name__ == '__main__':
