@@ -14,51 +14,6 @@ cargos = [{'weight': lst_cargo_weight[i], 'length': lst_cargo_len[i], 'height': 
 cargo_list = []
 
 
-def create_platforms_with_cargo(cargo):
-    MAX_MASS = 50000
-    mass = 0
-    cargo_len = 0
-    types_platform = {"13-401": (70, (13400, 2770), 20.92, 1810, 36841000),
-                      "13-926": (73, (18400, 2830), 27, 1807, 51789000)}
-
-    x_cargo = -1 * (13400 / 2)
-    y_cargo = 0
-    platform = []
-    cargo_coords = []
-    i = 0
-    take_new_platform = False
-    max_len = 13400
-    x_cargo += cargo[0][1][0] / 2
-    cargo_coords.append((x_cargo, y_cargo))
-    while mass < MAX_MASS and cargo_len < 18400 and i < len(cargo):
-        if mass + cargo[i][0] < MAX_MASS and cargo_len + cargo[i][1][0] + bx.SPACE < max_len:
-            mass += cargo[i][0]
-            cargo_len += cargo[i][1][0] + bx.SPACE
-            x_cargo += cargo[i][1][0] + bx.SPACE
-            if i > 1:
-                cargo_coords.append((x_cargo, y_cargo))
-        else:
-            print("Ограничения по вместимости.")
-            break
-
-        # print(f"Общая масса равна: {mass}. Общая длинна: {cargo_len}")
-        i += 1
-
-    if cargo_len <= 13400:
-        platform_type = "13-401"
-    elif cargo_len <= 18400:
-        platform_type = "13-926"
-    else:
-        print("Критическая ошибка.")
-        return False
-
-    # print(cargo_coords)
-    for i in range(0, len(cargo) - 1):
-        platform.append((cargo[i], cargo_coords[i]))
-
-    return platform, platform_type
-
-
 def select_platforms_by_cargos(cargos):
     """
     Распределитель грузов по вагонам
@@ -92,7 +47,7 @@ def select_platforms_by_cargos(cargos):
     current_platform_type = '13-401'
     current_cargos = []
     for cargo in filter(filter_unexpected, cargos):
-        total_cargos_length = sum([c['length'] for c in current_cargos])
+        total_cargos_length = sum([c['length'] for c in current_cargos])+(len(current_cargos) * bx.SPACE)
         total_cargos_mass = sum([c['weight'] for c in current_cargos])
 
         # Если груз становиться слишком тяжелым - добавляем на новую платформу
@@ -125,10 +80,11 @@ def select_platforms_by_cargos(cargos):
 
         current_cargos.append({**cargo, 'x': total_cargos_length, 'y': 0, 'z': 0})
 
-    platforms.append({
-        **types_platform[current_platform_type],
-        'cargos': current_cargos.copy()
-    })
+    if current_cargos:
+        platforms.append({
+            **types_platform[current_platform_type],
+            'cargos': current_cargos.copy()
+        })
 
     return platforms
 
