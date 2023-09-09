@@ -1,12 +1,15 @@
 import aspose.pdf as ap
 from io import BytesIO
+import pandas as pd
+import functions_for_boxes
 
 
-def get_rpz_report(wares) -> bytes:
+def get_rpz_report(wares: pd.DataFrame) -> bytes:
     """
     return: a full РПЗ PDF file
     wares: Данные о грузах
     """
+
     replacements = {
         'gravity_height': 'gravity_height',
         'func_4_1': 'func_4_1'

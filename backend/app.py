@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from flask import jsonify
+import pandas as pd
 import json
 
 from report_generator import get_rpz_report
@@ -15,21 +15,8 @@ def index():
     return render_template('index.html', materials_list=materials_list)
 
 
-@app.route('/result', methods=['POST', 'GET'])
-def result():
-    if request.method == 'POST':
-        try:
-            data = request.json
-            print(data)
-            return jsonify({'message': "OK"}), 200
-        except:
-            raise ValueError()
-    else:
-        return render_template("result.html")
-
-
-@app.route('/download/file1', methods=['POST'])
-def download_file1():
+@app.route('/download/download_scheme', methods=['POST'])
+def download_scheme():
     input_data = request.json
     print(input_data)
     data = None
@@ -38,11 +25,14 @@ def download_file1():
     return data
 
 
-@app.route('/download/file2', methods=['POST'])
-def download_file2():
+@app.route('/download/download_RPZ', methods=['POST'])
+def download_RPZ():
     input_data = request.json
-    print(input_data)
-    rpz_report = get_rpz_report(input_data)
+    df_data = pd.DataFrame(
+        input_data[1:],
+        columns=input_data[0],
+        dtype=pd.Int32Dtype)
+    rpz_report = get_rpz_report(df_data)
     return rpz_report
 
 
