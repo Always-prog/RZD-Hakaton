@@ -24,26 +24,27 @@
 
 <body>
 	<h2 class="header">Характеристики груза</h2>
-
-	<table id="cargo_table" class="responsive-table striped">
-		<thead>
-			<tr>
-				<th>№ п/п</th>
-				<th>№ груза</th>
-				<th>Наименование груза</th>
-				<th>Длина (мм)</th>
-				<th>Ширина (мм)</th>
-				<th>Высота (мм)</th>
-				<th>Кол-во (шт)</th>
-				<th>Вес 1 ед (кг)</th>
-				<th>Общий вес (кг)</th>
-			</tr>
-		</thead>
-		<tbody></tbody>
-	</table>
+		<table id="cargo_table" class="responsive-table striped">
+			<thead >
+				<tr>
+					<th>№ п/п</th>
+					<th>№ груза</th>
+					<th>Наименование груза</th>
+					<th>Длина (мм)</th>
+					<th>Ширина (мм)</th>
+					<th>Высота (мм)</th>
+					<th>Кол-во (шт)</th>
+					<th>Вес 1 ед (кг)</th>
+					<th>Общий вес (кг)</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
 
 	<button class="btn waves-effect waves-light" onclick="addRow()">Добавить строку</button>
-	<button class="btn waves-effect waves-light" onclick="sendData()">Отправить данные</button>
+	<!-- <button class="btn waves-effect waves-light" onclick="sendData()">Отправить данные</button> -->
+	<button class="btn waves-effect waves-light" onclick="getFile('/download/file1', 'Схема.pdf')">Скачать схему</button>
+	<button class="btn waves-effect waves-light" onclick="getFile('/download/file2', 'РПЗ.pdf')">Скачать РПЗ</button>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 	<script>
@@ -86,6 +87,52 @@
 			cells[7].addEventListener("input", updateTotalWeight);
 		}
 
+		function getFile (link, file_name) {
+			const data = getCargoData();
+			fetch(link, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(data)
+			})
+			.then(response => response.blob())
+			.then(blob => {
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = file_name;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				URL.revokeObjectURL(url);
+			})
+			.catch(error => {
+				// Handle error
+				console.error(error);
+			});
+		}
+
+		function getCargoData() {
+			const table = document.querySelector("#cargo_table");
+			const rows = table.rows;
+			const data = [];
+
+			for (let i = 0; i < rows.length; i++) {
+				const row = rows[i];
+				const cells = row.cells;
+				const rowData = [];
+
+				for (let j = 0; j < cells.length; j++) {
+					const cell = cells[j];
+					const value = cell.querySelector("input") ? cell.querySelector("input").value : cell.innerHTML;
+					rowData.push(value);
+				}
+
+				data.push(rowData);
+			}
+			return data
+		}
 		// Sends the data from a HTML table to a specified URL via a POST request.
 		function sendData() {
 			const table = document.querySelector("#cargo_table");
@@ -112,26 +159,17 @@
 				},
 				body: JSON.stringify(data)
 			})
-				.then(response => {
-					var newPageUrl = response.url;
-					window.location.href = newPageUrl;
+				.then(response => response.json())
+				.then(data => {
+					if (data.message == "OK"){
+						const showFilesElement = document.getElementById("show_files");
+						showFilesElement.value = "true"
+					}
 				})
 				.catch(error => {
 					// Handle error
 					console.error(error);
 				});
-
-			/*
-			const xhr = new XMLHttpRequest();
-			xhr.open("POST", "https://3ec79579-3055-4665-bf4c-6ba87105f58d.mock.pstmn.io", true);
-			xhr.setRequestHeader("Content-Type", "application/json");
-			xhr.onreadystatechange = function () {
-				if (xhr.readyState === 4 && xhr.status === 200) {
-					new Notification("Данные успешно отправлены!");
-				}
-			};
-			xhr.send(JSON.stringify(data));
-			*/
 		}
 	</script>
 </body>
