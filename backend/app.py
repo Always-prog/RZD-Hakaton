@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request
 from flask import jsonify
+import json
 app = Flask(__name__)
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', show_files=False)
+    materials_list = []
+    with open('./materials.json', 'r') as f:
+        materials_list = json.load(f)
+    return render_template('index.html', materials_list=materials_list)
 
 
 @app.route('/result', methods=['POST', 'GET'])
