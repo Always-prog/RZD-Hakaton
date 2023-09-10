@@ -57,7 +57,7 @@ def select_platforms_by_cargos(cargos):
     """
     random.shuffle(cargos)
 
-    LIMIT_CARGOS_MASS = 50000  # 50 ТОНН.
+    LIMIT_CARGOS_MASS = 50000  # 50 тонн. Показатель взят из документации
     DEFAULT_PLATFORM = '13-401'
 
     types_platform = {
@@ -166,40 +166,13 @@ def info_cargo(lst_cargo_weight, lst_cargo_len, lst_cargo_width, lst_cargo_heigh
     return res
 
 
-def veight(cargo):
+def weight(cargo):
+    """Ключ для сортировки по весу"""
     return -cargo[0]
 
 
 def square(cargo):
+    """Ключ для сортировки по площади"""
     print(cargo[1][0] * cargo[1][1])
     return (-cargo[1][0] * cargo[1][1])
-
-
-def optimize_platforms(cargos):
-    min_platforms = len(cargos)
-    for i in range(500):
-        platforms = len(select_platforms_by_cargos(cargos))
-        random.shuffle(cargos)
-        if platforms < min_platforms:
-            min_platforms = platforms
-
-        for i in range(500):
-            random.shuffle(cargos)
-            platforms = select_platforms_by_cargos(cargos)
-            if len(platforms) == min_platforms:
-                return platforms
-        #Резервный вариант
-        return platforms
-
-
-if __name__ == '__main__':
-    cargo = info_cargo(lst_cargo_weight, lst_cargo_len, lst_cargo_width, lst_cargo_height)
-    import json
-
-    # print([p['type'] for p in select_platforms_by_cargos(cargos)])
-    #print(json.dumps(select_platforms_by_cargos(cargos), indent=3))
-    # my_lst.sort(key=square)
-    # print(cargo)
-    print('-' * 20)
-    print(len(optimize_platforms(cargos)))
 
