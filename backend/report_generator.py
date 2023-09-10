@@ -1,8 +1,7 @@
 from io import BytesIO
-import functions_for_boxes as bx
 import aspose.pdf as ap
-import random
 from platforms_stuff import select_platforms_by_cargos
+import functions_for_boxes as bx
 
 
 def get_rpz_reports(cargos) -> list[bytes]:
