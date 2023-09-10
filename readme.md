@@ -4,6 +4,8 @@
 
 ## Установка
 
+Для установки и запуска приложения требуется установленный Python 3.11
+
 1. Клонируйте репозиторий:
 
 ```bash
@@ -20,6 +22,12 @@ cd RZD-Hakaton/backend
 
 ```bash
 pip install -r requirements.txt
+```
+
+4. Если устанавливаете на Linux, необходимо установить шрифты:
+
+```bash
+sudo apt-get install ttf-mscorefonts-installer
 ```
 
 ## Использование
